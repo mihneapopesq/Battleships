@@ -42,6 +42,36 @@ class Strings:
         BOT_DESTROYED = "destroyed"
         BOT_ERROR = "error"
 
+    class HelpFrame:
+        MSG_HELP = """
+        Players:
+•   2
+
+        Goal:
+•   Sink all of your opponent’s ships
+
+        Setup:
+•   Each player places ships on the bottom grid
+
+        Rules:
+•   Take turns firing shots by calling out grid coordinates
+•   Mark shots you fire on the vertical target grid
+        """
+
+
+class MyExceptions:
+    MAP_ERROR = "MapError"
+
+
+class Dimensions:
+    APP_MAX_WIDTH = 1000
+    APP_MAX_HEIGHT = 600
+
+    APP_MIN_WIDTH = 1000
+    APP_MIN_HEIGHT = 600
+
+
+
 class Colors:
 
     MAP_COLOR = "white"
