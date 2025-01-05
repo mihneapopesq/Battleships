@@ -90,3 +90,44 @@ class Ship(object):
             return True
 
         return False
+
+    def mark_on_map(self, map_to_mark_on: list, ship_id: int):
+        """
+        Marks the ship to the given map
+        :param map_to_mark_on: map 10x10 list
+        :param ship_id: int - id of the ship
+        :return: None
+        """
+        x = self.__coordinate_x
+        y = self.__coordinate_y
+        for i in range(self.__type):
+            map_to_mark_on[x[i]][y[i]] = ship_id
+
+            if map_to_mark_on[x[i] - 1][y[i]] == 0:
+                map_to_mark_on[x[i] - 1][y[i]] = '.'
+            if map_to_mark_on[x[i] + 1][y[i]] == 0:
+                map_to_mark_on[x[i] + 1][y[i]] = '.'
+            if map_to_mark_on[x[i]][y[i] - 1] == 0:
+                map_to_mark_on[x[i]][y[i] - 1] = '.'
+            if map_to_mark_on[x[i]][y[i] + 1] == 0:
+                map_to_mark_on[x[i]][y[i] + 1] = '.'
+            if map_to_mark_on[x[i] - 1][y[i] - 1] == 0:
+                map_to_mark_on[x[i] - 1][y[i] - 1] = '.'
+            if map_to_mark_on[x[i] + 1][y[i] + 1] == 0:
+                map_to_mark_on[x[i] + 1][y[i] + 1] = '.'
+            if map_to_mark_on[x[i] + 1][y[i] - 1] == 0:
+                map_to_mark_on[x[i] + 1][y[i] - 1] = '.'
+            if map_to_mark_on[x[i] - 1][y[i] + 1] == 0:
+                map_to_mark_on[x[i] - 1][y[i] + 1] = '.'
+
+    def is_possible_put_onto_map(self, map_to_mark_on: list):
+        """
+        :param map_to_mark_on: Player map 10x10 list
+        :return: True if it is possible to put onto the given map, False otherwise
+        """
+        x = self.__coordinate_x
+        y = self.__coordinate_y
+        for i in range(self.__type):
+            if map_to_mark_on[x[i]][y[i]] != 0:
+                return False
+        return True
