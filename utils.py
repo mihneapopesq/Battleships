@@ -50,3 +50,43 @@ class Ship(object):
         else:
             # Raises an Error
             raise ShipException("Ship is out of map", Errors.MAP_ERROR)
+
+    def __str__(self):
+        """
+        :return: type, orientation, coordinates, destroyed sells
+        """
+        coors = "Coordinates: "
+        destroyed_sells = "Destroyed sells: "
+        for i in range(self.__type):
+            coors += "(" + str(self.__coordinate_x[i]) + ", " + str(self.__coordinate_y[i]) + ") "
+            destroyed_sells += str(self.__destroyed[i]) + ", "
+
+        string = "Type: " + str(self.__type) + "\nOrientation: " \
+                 + str(self.__orientation) + "\n" + coors + "\n" + destroyed_sells
+
+        return string
+
+    def get_type(self):
+        """
+        :return: int [1, 4] - type of the ship
+        """
+        return self.__type
+
+    def hit(self, x, y):
+        """
+        Hit the part of the ship on the given coors
+        :param x: int (1-10) - X coordinate to check
+        :param y: int (1-10) - Y coordinate to check
+        :return: True if some part of the ship is destroyed, False otherwise
+        """
+        result = -1
+        for i in range(self.__type):
+            if x == self.__coordinate_x[i] and y == self.__coordinate_y[i]:
+                result = i
+                break
+
+        if result != -1 and not self.__destroyed[result]:
+            self.__destroyed[result] = True
+            return True
+
+        return False
