@@ -1,9 +1,53 @@
 import numpy as np
+import random
+import datetime
 import pyautogui
 from time import sleep
 
+import utils
+
 # Define the characters for display
 chars = {'unknown': '■', 'hit': 'X', 'miss': '□', 'sea': '■', 'destroyed': '*'}
+
+
+def get_random_player():
+    """
+    Creates a Player object with a random map
+    :return: Player
+    """
+    player = utils.Player()
+    ships = utils.get_list_of_ships()
+
+    j = 0
+    for ship in ships:
+        i = 0
+        j += 1
+        while not __is_added(player, ship):
+            i += 1
+
+    return player
+
+
+
+def __is_added(player, ship):
+    """
+    :param player: Player - an object Player
+    :param ship: Ship - a ship that has to be tried to put on the map of Player
+    :return: True if the given ship has been put successfully
+    """
+    random.seed(datetime.datetime.now().microsecond)
+
+    orientation = random.randint(1, 2)
+    if orientation == utils.HORIZONTAL:
+        x = random.randint(1, 11 - ship)
+        y = random.randint(1, 10)
+    else:
+        x = random.randint(1, 10)
+        y = random.randint(1, 11 - ship)
+
+    return player.add_ship(utils.Ship(ship, orientation, x, y))
+
+
 
 class Board:
     def __init__(self, size):
