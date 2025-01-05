@@ -21,6 +21,18 @@ class Strings:
         HEADER_ORIENTATION = "Orientation:"
         BUTTON_CHANGE = "Change orientation"
 
+        BUTTON_RANDOM = "Arrange randomly".upper()
+        BUTTON_START = "Start >>".upper()
+        BUTTON_CLEAR_ALL = "Clear all".upper()
+        BUTTON_BACK_MENU = "Back to menu".upper()
+        WARNING_ALL_SHIPS_PUT = "All %s ships have been placed!"
+        WARNING_SHIPS_CLEARED = "The map has been cleared!"
+        WARNING_PUT_ALL_SHIPS = "Place all ships before start game!"
+        WARNING_CAN_START = "All ships have been arranged. You can start game."
+        WARNING_CANNOT_PUT = "%s cannot be placed here!"
+        WARNING_EMPTY_MAP = "The map is empty to clear!"
+
+
         DIALOG_BACK_MENU = "Do you really want to go back to menu?"
         DIALOG_CLEAR_ALL = "Do you really want to clear all ships from the map?"
 
@@ -36,6 +48,14 @@ class Strings:
         MSG_DEFEAT = "Unfortunately.\nYou lost the battle."
         PLAYER_SHIPS = "You:"
         ENEMY_SHIPS = "Enemy:"
+
+        TURN_OF_PLAYER = "Your turn.".upper()
+        TURN_OF_ENEMY = "The enemy's turn.".upper()
+        WARNING_MISS = "miss!".upper()
+        WARNING_HIT = "hit!".upper()
+        WARNING_SHIP_DESTROYED = "Destroyed a ship!"
+        WARNING_TURN_OF_ENEMY = "Now is the enemy's turn"
+        WARNING_LAST_SHOT = "Last hit field: %s.  "
 
         BOT_SHOOT = "shoot"
         BOT_HIT = "hit"
