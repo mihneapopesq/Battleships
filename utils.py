@@ -1,68 +1,52 @@
-import numpy as np
+from exceptions import ShipException
+from constants import MyExceptions as Errors
+import constants
+
+BATTLESHIP = 4
+CRUISER = 3
+DESTROYER = 2
+SUBMARINE = 1
+HORIZONTAL = 1
+VERTICAL = 2
 
 
-# Place a random ship on the given board of the given length, making sure it does not intersect
-# with anything in no_intersect
-def place_random_ship(board, length, no_intersect):
-    placed = False
-    while not placed:
-        vertical = bool(np.random.randint(0, 2))  # Gives us a random boolean
+def get_list_of_ships():
+    """
+    return: All names of ships that must be created
+    """
+    return constants.LIST_OF_SHIPS
 
-        # We only need 3 random numbers, since either x or y will be the same between start and end points of
-        # the ship. To determine distance we ensure that the coordinate that differs, has a difference of ship_size
-        o1 = o2 = 0
-        while abs(o1 - o2) != length - 1:
-            s, o1, o2 = np.random.randint(0, board.size), np.random.randint(0, board.size), np.random.randint(0,
-                                                                                                            board.size)
 
-        if vertical:
-            y1 = y2 = s
-            x1 = o1
-            x2 = o2
+class Ship(object):
+
+    def __init__(self, tp: int, orientation: int, init_x: int, init_y: int) -> None:
+        """
+        :param tp: int (1-4) - which type is a ship(BATTLESHIP, CRUISER, DESTROYER, SUBMARINE)
+        :param orientation: int (1 or 2) - orientation of a ship (VERTICAL, HORIZONTAL)
+        :param init_y: int (1-10): X upper right coordinate of a ship
+        :param init_y: int (1-10): Y upper right coordinate of a ship
+        """
+        self.__type = tp
+        self.__orientation = orientation
+        self.__coordinate_x = []
+        self.__coordinate_y = []
+        self.__destroyed = []
+        self.__health = tp
+
+        # Check weather given ship is not out of the map
+        if 1 <= init_x <= 10 and 1 <= init_y <= 10 and \
+                (orientation == HORIZONTAL and init_x + tp <= 11 or orientation == VERTICAL and init_y + tp <= 11):
+
+            for i in range(self.__type):                    # Init coordinates Id and Destroyed param
+
+                if orientation == HORIZONTAL:               # Sets coordinates depending on orientation
+                    self.__coordinate_x.append(init_x + i)
+                    self.__coordinate_y.append(init_y)
+                else:
+                    self.__coordinate_x.append(init_x)
+                    self.__coordinate_y.append(init_y + i)
+
+                self.__destroyed.append(False)              # Setting coordinateIds and destroyed bool list
         else:
-            x1 = x2 = s
-            y1 = o1
-            y2 = o2
-
-        try:
-            ship_crds = place_ship(board, x1, y1, x2, y2, no_intersect)
-            board.ships.append(ship_crds)
-            placed = True
-        except AssertionError:
-            continue
-
-
-def place_ship(board, x1, y1, x2, y2, no_intersect):
-    # Make sure the ship will be a horizontal or vertical line
-    assert x1 == x2 or y1 == y2, "Coordinates must be inline"
-    # Make sure the ship is not of size one
-    assert not (x1 == x2 and y1 == y2), "Cannot be one point"
-    # Make sure all coords are on the board
-    for cd in [x1, x2, y1, y2]:
-        assert 0 <= cd < board.size, f"{cd} is not on board"
-
-    # Must be a better way to do all of this. But essentially the next 3 blocks inefficiently make it so that
-    # regardless of the order of coordinates, the system will work, and ensure that the ship is placed.
-    smallest_x, greatest_x = sorted([x1, x2])[0], sorted([x1, x2])[1]
-    smallest_y, greatest_y = sorted([y1, y2])[0], sorted([y1, y2])[1]
-
-    # Make sure the ship does not intersect another existing ship
-    for x in range(smallest_x, greatest_x + 1):
-        for y in range(smallest_y, greatest_y + 1):
-            assert board.get_board()[x, y] not in no_intersect, "Invalid intersection"
-
-    # Place the ship on the board
-    coords = []
-    for x in range(smallest_x, greatest_x + 1):
-        for y in range(smallest_y, greatest_y + 1):
-            board.get_board()[x, y] = board.inv_square_states['ship']
-            coords.append((x, y))
-
-    return coords
-
-
-# Convert a letter and a number into x and y coords
-def letter_to_coords(letter, number):
-    letter_coord = ord(letter) - 65
-    number_coord = int(number) - 1
-    return letter_coord, number_coord
+            # Raises an Error
+            raise ShipException("Ship is out of map", Errors.MAP_ERROR)
