@@ -108,3 +108,51 @@ class MapBuilder(object):
         :return: None
         """
         self.__player = player
+
+    def connect_maps(self):
+        """
+        Shows player's map on this map
+        :return: None
+        """
+        for i in range(1, 11):
+            ship = self.__player.get_ship(i)
+            if ship is not None:
+                for j in range(ship.get_type()):
+                    self.get_button(ship.get_x_at(j), ship.get_y_at(j)).config(bg=Color.SHIP_COLOR)
+
+    def get_button(self, x, y):
+        """
+        Gets the button at the fixed coordinate
+        :param x: int - X coordinate
+        :param y: int - Y coordinate
+        :return: tkinter object Button
+        """
+        return self.__buttons[y][x]
+
+    def refresh(self):
+        """
+        Makes a map as normal
+        :return: None
+        """
+        for y in range(1, 11):
+            for x in range(1, 11):
+                self.__buttons[y][x].config(bg=Color.MAP_COLOR)
+
+    def clickable(self, state: bool):
+        """
+        Makes the map impossible to click
+        :return: None
+        """
+        if state is True:
+            bt_state = NORMAL
+        else:
+            bt_state = DISABLED
+        for y in range(1, 11):
+            for x in range(1, 11):
+                self.__buttons[y][x].config(state=bt_state)
+
+    def get_frame(self):
+        """
+        :return: tkinter object Frame - the created MapFrame
+        """
+        return self.__frame_map
