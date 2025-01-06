@@ -204,3 +204,66 @@ class Player(object):
             if self.__ships[i] is not None:
                 return True
         return False
+
+    def is_completed(self):
+        """
+        :return: True if player's all ships put on the map, False otherwise
+        """
+        for i in range(1, 11):
+            if self.__ships[i] is None:
+                return False
+        return True
+
+    def show_map(self):
+        """
+        Prints the player's map X = [1, 10], Y = [1, 10]
+        :return: None
+        """
+        for i in range(1, 11):
+            for j in range(1, 11):
+                print(self.__map[i][j], end=" ")
+            print()
+
+    def remove_ship(self, index: int):
+        """
+        Removes the ship at the given point
+        :param index: int - index of the ship
+        :return: None
+        """
+        self.__ships[index] = None
+        if index == 1:
+            tp = 4
+        elif index in (2, 3):
+            tp = 3
+        elif index in (4, 5, 6):
+            tp = 2
+        else:
+            tp = 1
+        self.__shipsAmount[tp] -= 1
+
+    def add_ship(self, ship: Ship):
+        """
+        :param ship: Ship - a ship which have to be added
+        :return: True if the given ship placed successfully, False otherwise
+        """
+        tp = ship.get_type()
+        amount = self.__shipsAmount[tp]
+
+        if amount >= 5 - tp:
+            raise ShipException("All " + str(tp) + "type ships have already placed", res.MyExceptions.MAP_ERROR)
+
+        # Check adding possibilities
+        if amount < 5 - tp and ship.is_possible_put_onto_map(self.__map):
+            ship_id = amount + sum([i for i in range(5 - tp)]) + 1
+            self.__ships[ship_id] = ship
+            self.__shipsAmount[tp] += 1
+            ship.mark_on_map(self.__map, ship_id)
+            return True
+
+        return False
+
+    def get_ship(self, index: int):
+        """
+        :return: list of Ships - ships of this player
+        """
+        return self.__ships[index]
