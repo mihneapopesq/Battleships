@@ -1,9 +1,12 @@
-LIST_OF_SHIPS = (1, 1, 2, 1)
+LIST_OF_SHIPS = (5, 4, 3, 3, 2)
+
 BOT_SHOOT_TIME = {"shoot": 1000, "hit": 1500, "destroyed": 1500}
 
 
 class Strings:
     APP_NAME = "BattleShip"
+    APP_BACKGROUND = "drawable/battleship2.jpg"
+    APP_MUSIC = "sound/jook.wave"
 
     class MenuFrame:
         TITLE = "Menu:"
@@ -20,7 +23,6 @@ class Strings:
         HEADER_AMOUNT = "Amount:"
         HEADER_ORIENTATION = "Orientation:"
         BUTTON_CHANGE = "Change orientation"
-
         BUTTON_RANDOM = "Arrange randomly".upper()
         BUTTON_START = "Start >>".upper()
         BUTTON_CLEAR_ALL = "Clear all".upper()
@@ -32,14 +34,15 @@ class Strings:
         WARNING_CANNOT_PUT = "%s cannot be placed here!"
         WARNING_EMPTY_MAP = "The map is empty to clear!"
 
-
         DIALOG_BACK_MENU = "Do you really want to go back to menu?"
         DIALOG_CLEAR_ALL = "Do you really want to clear all ships from the map?"
 
-        SHIPS = [(1, "BATTLESHIP"),
-                 (1, "CRUISER"),
-                 (2, "DESTROYER"),
-                 (1, "SUBMARINE")]
+        SHIPS = [
+            (5, "BATTLESHIP"),
+            (4, "CRUISER"),
+            (3, "DESTROYER"),
+            (2, "SUBMARINE")
+        ]
 
     class GameFrame:
         TITLE_VICTORY = "Victory"
@@ -48,7 +51,6 @@ class Strings:
         MSG_DEFEAT = "Unfortunately.\nYou lost the battle."
         PLAYER_SHIPS = "You:"
         ENEMY_SHIPS = "Enemy:"
-
         TURN_OF_PLAYER = "Your turn.".upper()
         TURN_OF_ENEMY = "The enemy's turn.".upper()
         WARNING_MISS = "miss!".upper()
@@ -89,7 +91,6 @@ class Dimensions:
 
     APP_MIN_WIDTH = 1000
     APP_MIN_HEIGHT = 600
-
 
 
 class Colors:
