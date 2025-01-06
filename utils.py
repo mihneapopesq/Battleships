@@ -131,3 +131,26 @@ class Ship(object):
             if map_to_mark_on[x[i]][y[i]] != 0:
                 return False
         return True
+
+    def get_status(self):
+        """
+        :return: True if this ship is not destroyed, else False
+        """
+        for i in range(self.__type):
+            if not self.__destroyed[i]:
+                return True
+        return False
+
+    def get_x_at(self, index: int):
+        """
+        :param index: int - the index
+        :return: return coordinate X at the given index
+        """
+        return self.__coordinate_x[index]
+
+    def get_y_at(self, index: int):
+        """
+        :param index: int - the index
+        :return: return coordinate Y at the given index
+        """
+        return self.__coordinate_y[index]
