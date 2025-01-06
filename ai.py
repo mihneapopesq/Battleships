@@ -1,5 +1,6 @@
 from constants import Strings as String
-
+import random as rd
+import datetime as dt
 class Obj(object):
 
     def __init__(self):
@@ -82,3 +83,112 @@ class Obj(object):
 
         self.__mp[result[1]][result[0]] = True
         return result
+
+    def __get_one_of_four(self):
+        """
+        :return: tuple of two ints - top, bottom, left or right of the hit point
+        """
+        where = self.__random(1, 4)  # 1 - top, 2 - bottom, 3 - left, 4 - right
+
+        result = None
+        if where == 1 and self.__last_ship[0][1] > 1:
+            result = self.__last_ship[0][0], self.__last_ship[0][1] - 1
+
+        elif where == 2 and self.__last_ship[0][1] < 10:
+            result = self.__last_ship[0][0], self.__last_ship[0][1] + 1
+
+        elif where == 3 and self.__last_ship[0][0] > 1:
+            result = self.__last_ship[0][0] - 1, self.__last_ship[0][1]
+
+        elif where == 4 and self.__last_ship[0][0] < 10:
+            result = self.__last_ship[0][0] + 1, self.__last_ship[0][1]
+
+        if result is not None and not self.__mp[result[1]][result[0]]:
+            self.__print_map()
+            return result
+
+        return self.__get_one_of_four()
+
+    def __get_right_or_left(self):
+        """
+        :return: tuple of two ints - left or right of the hit point
+        """
+        which = self.__random(1, 2)  # 1 - left, 2 - right
+        result = None
+
+        xes = list([ship[0] for ship in self.__last_ship])
+        print("Bot1: xes: ", xes)
+        right = max(xes)
+        left = min(xes)
+
+        if which == 1 and left > 1:
+            result = left - 1, self.__last_ship[0][1]
+
+        if which == 2 and right < 10:
+            result = right + 1, self.__last_ship[0][1]
+
+        if result is not None and not self.__mp[result[1]][result[0]]:
+            return result
+
+        return self.__get_right_or_left()
+
+    def __get_top_or_bottom(self):
+        """
+        :return: tuple of two ints - top or bottom of the hit point
+        """
+        which = self.__random(3, 4)  # 3 - top, 4 - bottom
+        result = None
+
+        yes = list([ship[1] for ship in self.__last_ship])
+        print("Bot1: yes: ", yes)
+        bottom = max(yes)
+        top = min(yes)
+
+        if which == 3 and top > 1:
+            result = self.__last_ship[0][0], top - 1
+
+        if which == 4 and bottom < 10:
+            result = self.__last_ship[0][0], bottom + 1
+
+        if result is not None and not self.__mp[result[1]][result[0]]:
+            return result
+
+        return self.__get_top_or_bottom()
+
+    def __destroyed(self):
+        """
+        Calls when the bot receives "destroyed" command
+        :return:
+        """
+        for x, y in self.__last_ship:
+            print("Bot1: destroyed coors -", x, y)
+            self.__mp[y + 1][x] = True
+            self.__mp[y - 1][x] = True
+            self.__mp[y][x + 1] = True
+            self.__mp[y][x - 1] = True
+
+            self.__mp[y + 1][x + 1] = True
+            self.__mp[y - 1][x - 1] = True
+            self.__mp[y - 1][x + 1] = True
+            self.__mp[y + 1][x - 1] = True
+
+        self.__last_ship = []
+
+        return self.__shoot()
+
+    @staticmethod
+    def __random(start: int, end: int):
+        """
+        :param start: int - start point
+        :param end: int - end point
+        :return: int - random number
+        """
+        rd.seed(dt.datetime.now().microsecond)
+        return rd.randint(start, end)
+
+    def __print_map(self):
+        print("\n Time:", self.__time)
+        for i in range(1, 11):
+            for j in range(1, 11):
+                print(self.__mp[i][j], end=" ")
+            print()
