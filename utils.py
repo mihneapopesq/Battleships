@@ -250,7 +250,7 @@ class Player(object):
         amount = self.__shipsAmount[tp]
 
         if amount >= 5 - tp:
-            raise ShipException("All " + str(tp) + "type ships have already placed", res.MyExceptions.MAP_ERROR)
+            raise ShipException("All " + str(tp) + "type ships have already placed", constants.MyExceptions.MAP_ERROR)
 
         # Check adding possibilities
         if amount < 5 - tp and ship.is_possible_put_onto_map(self.__map):
