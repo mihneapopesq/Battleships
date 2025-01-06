@@ -154,3 +154,53 @@ class Ship(object):
         :return: return coordinate Y at the given index
         """
         return self.__coordinate_y[index]
+
+class Player(object):
+
+    def __init__(self):
+        # Amount of ships for each type: NONE, 1: SUBMARINE, 2: DESTROYER, 3: CRUISER, 4: BATTLESHIP
+        self.__shipsAmount = [None, 0, 0, 0, 0]
+        # List of ships: [0]: BATTLESHIP, [1, 2]: CRUISER, [3, 5]: DESTROYER, [6, 9]: SUBMARINE
+        self.__ships = [None, None, None, None, None,
+                        None, None, None, None, None, None]
+        # Map of the player
+        self.__map = []
+
+        # Creates empty map, 0: empty space, 1: ship, indexes = [1, 10]
+        for i in range(12):
+            row = []
+            for j in range(12):
+                row.append(0)
+            self.__map.append(row)
+
+    def __str__(self):
+
+        string = ""
+        for i in range(10):
+            string += "\nShip #" + str(i+1) + " >>>>>>>>>>>>>>>>>>>>>>>\n" + str(self.__ships[i+1])
+
+        return string
+
+    def get_point_on_map(self, x: int, y: int):
+        """
+        :param x: int - X coordinate of the map
+        :param y: int - y coordinate of the map
+        :return:
+        """
+        return self.__map[x][y]
+
+    def get_non_placed_amount(self, tp: int):
+        """
+        :param tp: int - type of the ship
+        :return: int - amount of the given type
+        """
+        return 5 - tp - self.__shipsAmount[tp]
+
+    def is_some_ships_placed(self):
+        """
+        :return: True if at list one ship is placed else False
+        """
+        for i in range(1, 11):
+            if self.__ships[i] is not None:
+                return True
+        return False
