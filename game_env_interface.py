@@ -343,3 +343,204 @@ class MenuFrame(object):
         :return: Frame - created Frame
         """
         return self.__frame
+
+class HelpFrame(object):
+
+    def __init__(self, context):
+        self.__context = context
+        self.__frame = Frame(context.get_root())
+        self.__button_back = None
+        self.__create_frame(self.__frame)
+
+    def __on_back_button_pressed(self):
+        """
+        Calls when the exit button is clicked
+        :return: None - goes to the menu frame
+        """
+        self.__context.on_help_back_button_pressed()
+
+    def __create_frame(self, root):
+        """
+        Creates the frame
+        :param root: tkinter master - the root that this frame must to be placed on
+        :return: None
+        """
+        root.config(padx=20,
+                    width=20)
+        self.__button_back = Button(self.__context.get_root(),
+                                    text=String.StatusFrame.BUTTON_BACK_MENU,
+                                    command=self.__on_back_button_pressed)
+
+        Message(root,
+                text=String.HelpFrame.MSG_HELP,
+                justify=LEFT,
+                fg=Color.HELP_MSG,
+                font="Verdana 20 bold").pack()
+
+    def place_frame(self):
+        """
+        Places the frame to the window
+        :return: None
+        """
+        self.__button_back.place(relx=0.01,
+                                 rely=0.05,
+                                 anchor=NW)
+        self.__frame.place(relx=0.17,
+                           rely=0.05,
+                           anchor=NW)
+
+    def displace_frame(self):
+        """
+        Displaces the frame form the window
+        :return: None
+        """
+        self.__button_back.place_forget()
+        self.__frame.place_forget()
+
+class ArrangeFrame(object):
+
+    def __init__(self, context):
+        self.__context = context
+        self.__chosen_ship = IntVar()
+        self.__chosen_ship.set(4)
+
+        # Ships choosing frame
+        self.__frame_choose = Frame(self.__context.get_root())
+        self.__create_choose_frame(self.__frame_choose)
+
+        # Attributes of status frame
+        self.__label_type = None
+        self.__label_amount = None
+        self.__orientation = True  # True if the ship is horizontal else False
+
+        # Chosen ship status frame
+        self.__frame_status = Frame(self.__context.get_root())
+        self.__create_status_frame(self.__frame_status)
+
+        # Sets up first status frame
+        self.__frame_of_orientation = \
+            self.__draw_ship(self.__frame_status, self.__chosen_ship.get(), self.__orientation)
+        self.__frame_of_orientation.pack()
+
+        # Map frame
+        self.__frame_map = Frame(self.__context.get_root())
+        self.__map = None
+        self.__create_map_frame(self.__frame_map)
+
+        # Attributes of message frame
+        self.__label_warnings = None
+
+        # Message frame
+        self.__frame_message = Frame(self.__context.get_root())
+        self.__create_message_frame(self.__frame_message)
+
+        # Special frame
+        self.__frame_special = Frame(self.__context.get_root())
+        self.__create_special_frame(self.__frame_special)
+
+        # Player object
+        self.__player = utils.Player()
+        self.__can_ship_be_put = True
+
+    def on_point_clicked(self, x, y):
+        """
+        Map click listener
+        :param x: int - X coordinate of the clicked grid
+        :param y: int - Y coordinate of the clicked grid
+        :return: None
+        """
+        if self.__player.get_non_placed_amount(self.__chosen_ship.get()) != 0:
+            if self.__orientation:
+                orientation = 1
+            else:
+                orientation = 2
+
+            ship_is_added = False
+            possible = self.__can_ship_be_put  # Checks weather the chosen ship can be put
+            if possible:
+                ship = utils.Ship(self.__chosen_ship.get(), orientation, x, y)
+                ship_is_added = self.__player.add_ship(ship)
+                if ship_is_added:
+
+                    if self.__chosen_ship.get() > 1 and \
+                            self.__player.get_non_placed_amount(self.__chosen_ship.get()) == 0:
+                        self.__chosen_ship.set(self.__chosen_ship.get() - 1)
+
+                    print("StatusFrame: this ship is added\n" + str(ship))
+
+            if not possible or not ship_is_added:  # Warms if the ship cannot be placed
+                self.__show_warning(String.StatusFrame.WARNING_CANNOT_PUT
+                                    % (String.StatusFrame.SHIPS[4 - self.__chosen_ship.get()][1]), "red")
+
+            # At the end, refreshing the status
+            self.__on_ship_chosen()
+            self.__orientation = not self.__orientation
+            self.__on_change_button_pressed()
+
+            if self.__player.is_completed():
+                self.__show_warning(String.StatusFrame.WARNING_CAN_START, "green")
+        else:
+            print("StatusFrame: all", self.__chosen_ship.get(), "type ships are added")
+            self.__show_warning(String.StatusFrame.WARNING_ALL_SHIPS_PUT
+                                % (String.StatusFrame.SHIPS[4 - self.__chosen_ship.get()][1]), "red")
+
+    def on_mouse_entered(self, event, x, y):
+        """
+        Calls when the mouse is entered any button
+        :param event: tkinter event object
+        :param x: int - x coordinate of the clicked button
+        :param y: int - y coordinate of the clicked button
+        :return: None
+        """
+        # Checks weather there is enough ship in chosen type to put
+        if self.__player.get_non_placed_amount(self.__chosen_ship.get()) > 0:
+
+            if self.__orientation:  # orientation is horizontal
+                if x + self.__chosen_ship.get() > 11:
+                    end_x = 11
+                    self.__can_ship_be_put = False
+                    color = Color.ERROR_COLOR
+                else:
+                    end_x = x + self.__chosen_ship.get()
+                    self.__can_ship_be_put = True
+                    color = Color.SHIP_COLOR
+
+                # Setting up active background (the button that is the mouse on it)
+                if self.__player.get_point_on_map(x, y) != 0:
+                    event.widget.config(activebackground=Color.ERROR_COLOR)
+                else:
+                    event.widget.config(activebackground=color)
+
+                for i in range(x, end_x):
+                    point = self.__player.get_point_on_map(i, y)
+                    if point != 0:  # is not possible to put on this point
+                        self.__map.get_button(i, y).config(bg=Color.ERROR_COLOR)
+                    else:
+                        self.__map.get_button(i, y).config(bg=color)
+
+            else:  # orientation is vertical
+
+                if y + self.__chosen_ship.get() > 11:
+                    end_y = 11
+                    self.__can_ship_be_put = False
+                    color = Color.ERROR_COLOR
+                else:
+                    end_y = y + self.__chosen_ship.get()
+                    self.__can_ship_be_put = True
+                    color = Color.SHIP_COLOR
+
+                # Setting up active background (the button that is the mouse on it)
+                if self.__player.get_point_on_map(x, y) != 0:
+                    event.widget.config(activebackground=Color.ERROR_COLOR)
+                else:
+                    event.widget.config(activebackground=color)
+
+                for i in range(y, end_y):
+                    point = self.__player.get_point_on_map(x, i)
+                    if point != 0:  # is not possible to put on this point
+                        self.__map.get_button(x, i).config(bg=Color.ERROR_COLOR)
+                    else:
+                        self.__map.get_button(x, i).config(bg=color)
+        else:
+            if self.__player.get_point_on_map(x, y) not in ('.', 0):
+                event.widget.config(activebackground=Color.SHIP_COLOR)
