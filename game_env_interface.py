@@ -1,10 +1,11 @@
 from tkinter import *
 from tkinter import messagebox as msg
-from constants import Colors as Color
 from constants import Strings as String
+from constants import Colors as Color
 from constants import BOT_SHOOT_TIME
 import utils
 import board
+
 
 class MapBuilder(object):
 
@@ -160,6 +161,7 @@ class MapBuilder(object):
         :return: tkinter object Frame - the created MapFrame
         """
         return self.__frame_map
+
 
 class StatusBuilder(object):
 
@@ -347,58 +349,6 @@ class MenuFrame(object):
         """
         return self.__frame
 
-class HelpFrame(object):
-
-    def __init__(self, context):
-        self.__context = context
-        self.__frame = Frame(context.get_root())
-        self.__button_back = None
-        self.__create_frame(self.__frame)
-
-    def __on_back_button_pressed(self):
-        """
-        Calls when the exit button is clicked
-        :return: None - goes to the menu frame
-        """
-        self.__context.on_help_back_button_pressed()
-
-    def __create_frame(self, root):
-        """
-        Creates the frame
-        :param root: tkinter master - the root that this frame must to be placed on
-        :return: None
-        """
-        root.config(padx=20,
-                    width=20)
-        self.__button_back = Button(self.__context.get_root(),
-                                    text=String.StatusFrame.BUTTON_BACK_MENU,
-                                    command=self.__on_back_button_pressed)
-
-        Message(root,
-                text=String.HelpFrame.MSG_HELP,
-                justify=LEFT,
-                fg=Color.HELP_MSG,
-                font="Verdana 20 bold").pack()
-
-    def place_frame(self):
-        """
-        Places the frame to the window
-        :return: None
-        """
-        self.__button_back.place(relx=0.01,
-                                 rely=0.05,
-                                 anchor=NW)
-        self.__frame.place(relx=0.17,
-                           rely=0.05,
-                           anchor=NW)
-
-    def displace_frame(self):
-        """
-        Displaces the frame form the window
-        :return: None
-        """
-        self.__button_back.place_forget()
-        self.__frame.place_forget()
 
 class ArrangeFrame(object):
 
@@ -414,7 +364,7 @@ class ArrangeFrame(object):
         # Attributes of status frame
         self.__label_type = None
         self.__label_amount = None
-        self.__orientation = True  # True if the ship is horizontal else False
+        self.__orientation = True  # True if the ship is horizontal else Folse
 
         # Chosen ship status frame
         self.__frame_status = Frame(self.__context.get_root())
@@ -677,7 +627,7 @@ class ArrangeFrame(object):
         Calls when one of the ships is chosen
         :return: None
         """
-        text = String.StatusFrame.HEADER_TYPE + " " + String.StatusFrame.SHIPS[4 - self.__chosen_ship.get()][1]
+        text = String.StatusFrame.HEADER_TYPE + " " + String.StatusFrame.SHIPS[4-self.__chosen_ship.get()][1]
         self.__label_type.config(text=text)
 
         text = String.StatusFrame.HEADER_AMOUNT + " " + str(
@@ -788,11 +738,10 @@ class ArrangeFrame(object):
               pady=2).pack(anchor=W)
 
         # Change orientation button
-        # Button(root,
+        #Button(root,
         #       text=String.StatusFrame.BUTTON_CHANGE,
         #       width=15,
         #       command=self.__on_change_button_pressed).pack(anchor=W)
-
 
     def __create_map_frame(self, root):
         """
@@ -900,6 +849,7 @@ class ArrangeFrame(object):
         :return: tkinter master
         """
         return self.__frame_map
+
 
 class GameFrame(object):
     time = 0
@@ -1119,8 +1069,7 @@ class GameFrame(object):
                     self.__set_warning(String.GameFrame.WARNING_HIT, "blue")
 
                     if defence is self.__player:  # Letting to enemy know that he hit
-                        mp.get_button(1, 1).after(BOT_SHOOT_TIME["hit"],
-                                                  lambda: self.__get_shoot_from_enemy(String.GameFrame.BOT_HIT))
+                        mp.get_button(1, 1).after(BOT_SHOOT_TIME["hit"], lambda: self.__get_shoot_from_enemy(String.GameFrame.BOT_HIT))
 
                 else:
                     mp.get_button(x, y).config(state=DISABLED)
@@ -1131,8 +1080,7 @@ class GameFrame(object):
 
                     if defence is self.__player:  # Letting to enemy know that he destroyed
                         self.__status_player.refresh()
-                        mp.get_button(1, 1).after(BOT_SHOOT_TIME["destroyed"], lambda: self.__get_shoot_from_enemy(
-                            String.GameFrame.BOT_DESTROYED))  # Refreshes status
+                        mp.get_button(1, 1).after(BOT_SHOOT_TIME["destroyed"], lambda: self.__get_shoot_from_enemy(String.GameFrame.BOT_DESTROYED))  # Refreshes status
                     else:
                         self.__status_enemy.refresh()  # Refreshes status
 
@@ -1149,5 +1097,149 @@ class GameFrame(object):
                                        state=DISABLED)
 
             if defence is self.__enemy:  # Letting to enemy to shoot
-                mp.get_button(1, 1).after(BOT_SHOOT_TIME["shoot"],
-                                          lambda: self.__get_shoot_from_enemy(String.GameFrame.BOT_SHOOT))
+                mp.get_button(1, 1).after(BOT_SHOOT_TIME["shoot"], lambda: self.__get_shoot_from_enemy(String.GameFrame.BOT_SHOOT))
+
+    @staticmethod
+    def __ship_destroyed(ship: utils.Ship, mp: MapBuilder):
+        """
+        :param ship: Ship - a ship that has destroyed
+        :param mp: MapBuilder - a map that the ship is placed
+        :return: None
+        """
+        for i in range(ship.get_type()):
+            x = ship.get_x_at(i)
+            y = ship.get_y_at(i)
+
+            mp.get_button(x, y).config(text="X",
+                                       bg=Color.DESTROYED_SHIP)
+
+            # Automatically hitting adjacent points
+            if x < 10 and mp.get_button(x + 1, y).cget("bg") == Color.MAP_COLOR:
+                mp.get_button(x + 1, y).config(bg=Color.BROKEN_POINT,
+                                               text="*",
+                                               state=DISABLED)
+            if x > 1 and mp.get_button(x - 1, y).cget("bg") == Color.MAP_COLOR:
+                mp.get_button(x - 1, y).config(bg=Color.BROKEN_POINT,
+                                               text="*",
+                                               state=DISABLED)
+            if y < 10 and mp.get_button(x, y + 1).cget("bg") == Color.MAP_COLOR:
+                mp.get_button(x, y + 1).config(bg=Color.BROKEN_POINT,
+                                               text="*",
+                                               state=DISABLED)
+            if y > 1 and mp.get_button(x, y - 1).cget("bg") == Color.MAP_COLOR:
+                mp.get_button(x, y - 1).config(bg=Color.BROKEN_POINT,
+                                               text="*",
+                                               state=DISABLED)
+            if x < 10 and y < 10 and mp.get_button(x + 1, y + 1).cget("bg") == Color.MAP_COLOR:
+                mp.get_button(x + 1, y + 1).config(bg=Color.BROKEN_POINT,
+                                                   text="*",
+                                                   state=DISABLED)
+            if x > 1 and y > 1 and mp.get_button(x - 1, y - 1).cget("bg") == Color.MAP_COLOR:
+                mp.get_button(x - 1, y - 1).config(bg=Color.BROKEN_POINT,
+                                                   text="*",
+                                                   state=DISABLED)
+            if x > 1 and y < 10 and mp.get_button(x - 1, y + 1).cget("bg") == Color.MAP_COLOR:
+                mp.get_button(x - 1, y + 1).config(bg=Color.BROKEN_POINT,
+                                                   text="*",
+                                                   state=DISABLED)
+            if x < 10 and y > 1 and mp.get_button(x + 1, y - 1).cget("bg") == Color.MAP_COLOR:
+                mp.get_button(x + 1, y - 1).config(bg=Color.BROKEN_POINT,
+                                                   text="*",
+                                                   state=DISABLED)
+
+    def place_frame(self):
+        """
+        Places frame onto the root frame
+        :return: None
+        """
+        self.__frame_player.place(relx=0.05,
+                                  rely=0.95,
+                                  anchor=SW)
+        self.__frame_enemy.place(relx=0.95,
+                                 rely=0.95,
+                                 anchor=SE)
+        self.__frame_status_player.place(relx=0.05,
+                                         rely=0.116,
+                                         anchor=NW)
+        self.__frame_status_enemy.place(relx=0.247,
+                                        rely=0.116,
+                                        anchor=NW)
+        self.__frame_bar.place(relx=0.05,
+                               rely=0.03,
+                               anchor=NW)
+
+    def displace_frame(self):
+        """
+        Displace the frame from the map
+        :return: None
+        """
+        self.__frame_player.place_forget()
+        self.__frame_enemy.place_forget()
+        self.__frame_status_player.place_forget()
+        self.__frame_status_enemy.place_forget()
+        self.__frame_bar.place_forget()
+
+    def destroy_frame(self):
+        """
+        Destroys this Game frame
+        :return:
+        """
+        self.__frame_player.destroy()
+        self.__frame_enemy.destroy()
+        self.__frame_status_player.destroy()
+        self.__frame_status_enemy.destroy()
+        self.__frame_bar.destroy()
+
+
+class HelpFrame(object):
+
+    def __init__(self, context):
+        self.__context = context
+        self.__frame = Frame(context.get_root())
+        self.__button_back = None
+        self.__create_frame(self.__frame)
+
+    def __on_back_button_pressed(self):
+        """
+        Calls when the exit button is clicked
+        :return: None - goes to the menu frame
+        """
+        self.__context.on_help_back_button_pressed()
+
+    def __create_frame(self, root):
+        """
+        Creates the frame
+        :param root: tkinter master - the root that this frame must to be placed on
+        :return: None
+        """
+        root.config(padx=20,
+                    width=20)
+        self.__button_back = Button(self.__context.get_root(),
+                                    text=String.StatusFrame.BUTTON_BACK_MENU,
+                                    command=self.__on_back_button_pressed)
+
+        Message(root,
+                text=String.HelpFrame.MSG_HELP,
+                justify=LEFT,
+                fg=Color.HELP_MSG,
+                font="Verdana 20 bold").pack()
+
+    def place_frame(self):
+        """
+        Places the frame to the window
+        :return: None
+        """
+        self.__button_back.place(relx=0.01,
+                                 rely=0.05,
+                                 anchor=NW)
+        self.__frame.place(relx=0.17,
+                           rely=0.05,
+                           anchor=NW)
+
+    def displace_frame(self):
+        """
+        Displaces the frame form the window
+        :return: None
+        """
+        self.__button_back.place_forget()
+        self.__frame.place_forget()
