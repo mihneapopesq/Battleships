@@ -2,6 +2,7 @@ from tkinter import *
 from constants import Colors as Color
 from constants import Strings as String
 import utils
+import board
 
 class MapBuilder(object):
 
@@ -544,3 +545,88 @@ class ArrangeFrame(object):
         else:
             if self.__player.get_point_on_map(x, y) not in ('.', 0):
                 event.widget.config(activebackground=Color.SHIP_COLOR)
+
+    def on_mouse_leaved(self, event, x, y):
+        """
+        Calls when the mouse is leaved any button
+        :param event: tkinter event object
+        :param x: int - x coordinate of the clicked button
+        :param y: int - y coordinate of the clicked button
+        :return: None
+        """
+        event.widget.config(activebackground=Color.MAP_COLOR)
+
+        if self.__orientation:  # is horizontal
+            if x + self.__chosen_ship.get() > 10:
+                end_x = 11
+                self.__can_ship_be_put = False
+            else:
+                end_x = x + self.__chosen_ship.get()
+                self.__can_ship_be_put = True
+
+            for i in range(x, end_x):
+                point = self.__player.get_point_on_map(i, y)  # Checks weather point is not a ship
+                if point == '.' or point == 0:  # is empty point
+                    self.__map.get_button(i, y).config(bg=Color.MAP_COLOR)
+                else:  # is a ship
+                    if self.__map.get_button(i, y).cget("bg") == Color.ERROR_COLOR:  # Checks weather point is ship
+                        self.__map.get_button(i, y).config(bg=Color.SHIP_COLOR)
+
+        else:  # orientation is vertical
+
+            if y + self.__chosen_ship.get() > 10:
+                end_y = 11
+                self.__can_ship_be_put = False
+            else:
+                end_y = y + self.__chosen_ship.get()
+                self.__can_ship_be_put = True
+
+            for i in range(y, end_y):
+                point = self.__player.get_point_on_map(x, i)  # Checks weather point is not a ship
+                if point == '.' or point == 0:  # is empty point
+                    self.__map.get_button(x, i).config(bg=Color.MAP_COLOR)
+                else:  # is a ship
+                    if self.__map.get_button(x, i).cget("bg") == Color.ERROR_COLOR:  # Checks weather point is ship
+                        self.__map.get_button(x, i).config(bg=Color.SHIP_COLOR)
+
+    def on_mouse_right_clicked(self, event, x, y):
+        """
+        Calls when right button of the mouse is clicked
+        :param event: tkinter event
+        :param x: int - x coordinate of the clicked button
+        :param y: int - y coordinate of the clicked button
+        :return: None
+        """
+        self.on_mouse_leaved(event, x, y)
+        self.__on_change_button_pressed()
+        self.on_mouse_entered(event, x, y)
+
+    def __on_change_button_pressed(self):
+        """
+        Calls when change orientation is clicked
+        :return: None
+        """
+        if self.__frame_of_orientation is not None:
+            self.__frame_of_orientation.pack_forget()
+        self.__orientation = not self.__orientation
+        self.__frame_of_orientation = \
+            self.__draw_ship(self.__frame_status, self.__chosen_ship.get(), self.__orientation)
+        self.__frame_of_orientation.pack()
+
+    def __on_random_button_pressed(self):
+        """
+        Calls when random button is clicked
+        :return: None
+        """
+        self.__player = board.get_random_player()
+        self.__map.refresh()
+        for y in range(1, 11):
+            for x in range(1, 11):
+                point = self.__player.get_point_on_map(x, y)
+                if point != 0 and point != '.':  # is ship
+                    self.__map.get_button(x, y).config(bg=Color.SHIP_COLOR)
+
+        # Refresh status frame
+        self.__orientation = not self.__orientation
+        self.__on_change_button_pressed()
+
