@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox as msg
 from constants import Colors as Color
 from constants import Strings as String
+from constants import BOT_SHOOT_TIME
 import utils
 import board
 
@@ -1081,3 +1082,72 @@ class GameFrame(object):
         self.__label_warning.config(text=warning,
                                     fg=color)
         self.__label_warning.after(700, lambda: self.__label_warning.config(text=""))
+
+    def __show_result_of_battle(self, loser: utils.Player):
+        """
+        Shows a dialog that contains results of the battle
+        :param loser: Player - a player that lost the game
+        :return:
+        """
+        if loser is not self.__player:
+            msg.showinfo(String.GameFrame.TITLE_VICTORY, String.GameFrame.MSG_VICTORY)
+        else:
+            msg.showinfo(String.GameFrame.TITLE_DEFEAT, String.GameFrame.MSG_DEFEAT)
+
+        self.__context.on_game_back_button_pressed()  # Goes to the menu
+
+    def __hit_point(self, x: int, y: int, defence: utils.Player, mp: MapBuilder):
+        """
+        Calls when some one hit the map
+        :param x: int - X coordinate
+        :param y: int - Y coordinate
+        :param defence: Player - a player whose map is hit
+        :param mp: MapBuilder - Player's map
+        :return: None
+        """
+        point = defence.get_point_on_map(x, y)
+
+        if point != 0 and point != '.':  # Checks whether the player hit a ship
+            ship = defence.get_ship(point)  # Getting the ship at the chosen point
+
+            destroyed = ship.hit(x, y)  # Hits the ship
+            if destroyed:
+                if ship.get_status():
+                    print(ship, "\n")
+                    mp.get_button(x, y).config(bg=Color.DESTROYED_PART,
+                                               state=DISABLED)
+                    self.__set_warning(String.GameFrame.WARNING_HIT, "blue")
+
+                    if defence is self.__player:  # Letting to enemy know that he hit
+                        mp.get_button(1, 1).after(BOT_SHOOT_TIME["hit"],
+                                                  lambda: self.__get_shoot_from_enemy(String.GameFrame.BOT_HIT))
+
+                else:
+                    mp.get_button(x, y).config(state=DISABLED)
+                    self.__ship_destroyed(ship, mp)
+                    self.__set_warning(String.GameFrame.WARNING_SHIP_DESTROYED, "green")
+
+                    defence.remove_ship(point)  # Removes the destroyed ship from the player's list
+
+                    if defence is self.__player:  # Letting to enemy know that he destroyed
+                        self.__status_player.refresh()
+                        mp.get_button(1, 1).after(BOT_SHOOT_TIME["destroyed"], lambda: self.__get_shoot_from_enemy(
+                            String.GameFrame.BOT_DESTROYED))  # Refreshes status
+                    else:
+                        self.__status_enemy.refresh()  # Refreshes status
+
+                    if not defence.is_some_ships_placed():
+                        self.__show_result_of_battle(defence)  # Shows the results of the battle
+
+        else:
+            self.__is_turn_of_player = not self.__is_turn_of_player  # Changes the turn
+            self.__set_turn(self.__is_turn_of_player)
+
+            self.__set_warning(String.GameFrame.WARNING_MISS, "red")
+            mp.get_button(x, y).config(text="*",
+                                       bg=Color.BROKEN_POINT,
+                                       state=DISABLED)
+
+            if defence is self.__enemy:  # Letting to enemy to shoot
+                mp.get_button(1, 1).after(BOT_SHOOT_TIME["shoot"],
+                                          lambda: self.__get_shoot_from_enemy(String.GameFrame.BOT_SHOOT))
