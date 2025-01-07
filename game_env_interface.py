@@ -988,3 +988,96 @@ class GameFrame(object):
             self.__hit_point(coord[0], coord[1], self.__player, self.__map_player)
         else:
             print("GameFrame: enemy tries to shoot while it is player's turn")
+
+    def __create_player_frame(self, root):
+        """
+        Creates players map
+        :param root: tkinter master - container that the frame must be in
+        :return: None
+        """
+        print("GameFrame: player map created")
+        self.__map_player = MapBuilder(self, root, 1)
+        self.__map_player.clickable(False)
+        self.__map_player.get_frame().pack()
+
+    def __create_enemy_frame(self, root):
+        """
+        Creates enemies map
+        :param root: tkinter master - container that the frame must be in
+        :return: None
+        """
+        self.__map_enemy = MapBuilder(self, root, 2)
+        self.__map_enemy.get_frame().pack()
+
+    def __create_status_player_frame(self, root):
+        """
+        Creates status frame
+        :param root: tkinter master - container
+        :return: None
+        """
+        self.__status_player = StatusBuilder(self, root, String.GameFrame.PLAYER_SHIPS, self.__player)
+        self.__status_player.get_frame().pack()
+        self.__status_player.refresh()
+
+    def __create_status_enemy_frame(self, root):
+        """
+        Creates status frame
+        :param root: tkinter master - container
+        :return: None
+        """
+        self.__status_enemy = StatusBuilder(self, root, String.GameFrame.ENEMY_SHIPS, self.__enemy)
+        self.__status_enemy.get_frame().pack()
+        self.__status_enemy.refresh()
+
+    def __create_bar_frame(self, root):
+        """
+        Creates the bar frame
+        :param root: tkinter master - container
+        :return: None
+        """
+        root.config(padx=2,
+                    pady=2)
+
+        # Back to menu button
+        Button(root,
+               text=String.StatusFrame.BUTTON_BACK_MENU,
+               bg=Color.SHIP_COLOR,
+               command=self.__on_back_menu_button_clicked).pack(side="left")
+
+        # Turn label
+        self.__label_turn = Label(root,
+                                  text="Your turn",
+                                  width=30,
+                                  padx=3,
+                                  fg=Color.SHIP_COLOR)
+        self.__label_turn.pack(side="left")
+
+        # Warning label
+        self.__label_warning = Label(root,
+                                     width=46,
+                                     padx=4,
+                                     fg=Color.ERROR_COLOR,
+                                     font="time 12 bold italic")
+        self.__label_warning.pack(side="left")
+
+    def __set_turn(self, turn: bool):
+        """
+        :param turn: bool - Player's turn if True else Enemy's turn
+        :return: None - changes label_turn
+        """
+        if turn:
+            string = (String.GameFrame.WARNING_LAST_SHOT % str(self.__last_hit_field)) + String.GameFrame.TURN_OF_PLAYER
+        else:
+            string = (String.GameFrame.WARNING_LAST_SHOT % str(self.__last_hit_field)) + String.GameFrame.TURN_OF_ENEMY
+        self.__label_turn.config(text=string)
+
+    def __set_warning(self, warning: str, color: str):
+        """
+        Shows warning on the warning label
+        :param warning: str - the warning
+        :param color: str - color of the warning
+        :return: None
+        """
+        self.__label_warning.config(text=warning,
+                                    fg=color)
+        self.__label_warning.after(700, lambda: self.__label_warning.config(text=""))
