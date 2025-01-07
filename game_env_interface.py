@@ -802,3 +802,100 @@ class ArrangeFrame(object):
 
         # Map
         self.__map.get_frame().pack()
+
+    def __create_message_frame(self, root):
+        """
+        Creates Ship status frame
+        :param root: tkinter master - container that the frame must be in
+        :return: tkinter Frame - created Frame
+        """
+        # Warnings
+        self.__label_warnings = Label(root,
+                                      fg=Color.ERROR_COLOR,
+                                      bg=Color.MAP_COLOR,
+                                      width=43,
+                                      height=1,
+                                      font="time 12 italic")
+        self.__label_warnings.pack(anchor=W)
+
+    def __create_special_frame(self, root):
+        """
+        Creates Ship status frame
+        :param root: tkinter master - container that the frame must be in
+        :return: tkinter Frame - created Frame
+        """
+        # Clears all button
+        Button(root,
+               text=String.StatusFrame.BUTTON_CLEAR_ALL,
+               width=18,
+               anchor=W,
+               bg=Color.ERROR_COLOR,
+               fg="white",
+               command=self.__on_clear_button_pressed).pack()
+
+        # Random arrange button
+        Button(root,
+               text=String.StatusFrame.BUTTON_RANDOM,
+               width=18,
+               anchor=W,
+               bg=Color.SHIP_COLOR,
+               fg="white",
+               command=self.__on_random_button_pressed).pack()
+
+        # Back to menu button
+        Button(root,
+               text=String.StatusFrame.BUTTON_BACK_MENU,
+               width=18,
+               anchor=W,
+               bg=Color.BACK_BUTTON,
+               fg="white",
+               command=self.__on_back_menu_button_pressed).pack()
+
+        # Start button
+        Button(root,
+               text=String.StatusFrame.BUTTON_START,
+               anchor=W,
+               width=18,
+               command=self.__on_start_button_pressed).pack()
+
+    def place_frame(self):
+        """
+        Places the frame onto the master
+        :return: None
+        """
+        self.__frame_choose.place(relx=0.03,
+                                  rely=0.1,
+                                  anchor=NW)
+
+        self.__frame_status.place(relx=0.03,
+                                  rely=0.45,
+                                  anchor=NW)
+
+        self.__frame_map.place(relx=0.5,
+                               rely=0.08,
+                               anchor=N)
+
+        self.__frame_message.place(relx=0.5,
+                                   rely=0.95,
+                                   anchor=CENTER)
+
+        self.__frame_special.place(relx=0.97,
+                                   rely=0.9,
+                                   anchor=SE)
+
+    def displace_frame(self):
+        """
+        Displaces the frame from the master
+        :return: None
+        """
+        self.__frame_choose.place_forget()
+        self.__frame_status.place_forget()
+        self.__frame_map.place_forget()
+        self.__frame_message.place_forget()
+        self.__frame_special.place_forget()
+
+    def get_root(self):
+        """
+        :return: tkinter master
+        """
+        return self.__frame_map
