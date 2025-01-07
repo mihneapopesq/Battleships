@@ -1,5 +1,6 @@
 from tkinter import *
 from constants import Colors as Color
+from constants import Strings as String
 import utils
 
 class MapBuilder(object):
@@ -159,7 +160,7 @@ class MapBuilder(object):
 
 class StatusBuilder(object):
 
-    def __init__(self, context, master, title: str, player: objects.Player):
+    def __init__(self, context, master, title: str, player: utils.Player):
 
         self.__context = context
         self.__player = player
