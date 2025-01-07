@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import messagebox as msg
 from constants import Colors as Color
 from constants import Strings as String
 import utils
@@ -630,3 +631,68 @@ class ArrangeFrame(object):
         self.__orientation = not self.__orientation
         self.__on_change_button_pressed()
 
+    def __on_back_menu_button_pressed(self):
+        """
+        Calls when back to menu button is clicked
+        :return: None
+        """
+        is_player_agree = msg.askyesno(String.APP_NAME, String.StatusFrame.DIALOG_BACK_MENU)
+        if is_player_agree:
+            self.__context.on_arrange_back_button_pressed()
+
+    def __on_start_button_pressed(self):
+        """
+        Calls when the start button is clicked
+        :return: None - starts the game if all ships put on the map
+        """
+        print("StatusFrame: start button pressed...")
+        if self.__player.is_completed():
+            self.__context.on_start_game_button_pressed(self.__player)
+        else:
+            self.__show_warning(String.StatusFrame.WARNING_PUT_ALL_SHIPS, "red")
+
+    def __on_clear_button_pressed(self):
+        """
+        Calls when clear all button is clicked
+        :return: None - Clears all built ships
+        """
+        if self.__player.is_some_ships_placed():
+
+            is_player_agree = msg.askyesno(String.APP_NAME, String.StatusFrame.DIALOG_CLEAR_ALL)
+
+            if is_player_agree:
+                self.__player = None
+                self.__player = utils.Player()
+                self.__map.refresh()
+                self.__show_warning(String.StatusFrame.WARNING_SHIPS_CLEARED, "green")
+
+                # Refresh status frame
+                self.__on_ship_chosen()
+        else:
+            self.__show_warning(String.StatusFrame.WARNING_EMPTY_MAP, "red")
+
+    def __on_ship_chosen(self):
+        """
+        Calls when one of the ships is chosen
+        :return: None
+        """
+        text = String.StatusFrame.HEADER_TYPE + " " + String.StatusFrame.SHIPS[4 - self.__chosen_ship.get()][1]
+        self.__label_type.config(text=text)
+
+        text = String.StatusFrame.HEADER_AMOUNT + " " + str(
+            self.__player.get_non_placed_amount(self.__chosen_ship.get()))
+
+        self.__label_amount.config(text=text)
+
+        # Refresh status frame
+        self.__orientation = not self.__orientation
+        self.__on_change_button_pressed()
+
+    def __show_warning(self, warning: str, color: str):
+        """
+        :param warning: str - a warning that must be shown
+        :return: None
+        """
+        self.__label_warnings.config(text=warning,
+                                     fg=color)
+        self.__label_warnings.after(4000, lambda: self.__label_warnings.config(text=""))
