@@ -696,3 +696,109 @@ class ArrangeFrame(object):
         self.__label_warnings.config(text=warning,
                                      fg=color)
         self.__label_warnings.after(4000, lambda: self.__label_warnings.config(text=""))
+
+    @staticmethod
+    def __draw_ship(root, tp: int, orientation: bool):
+        """
+        Draws the orientation displaying frame
+        :param root: tkinter master - container that the frame must be in
+        :param tp: int [1, 4] - type of a ship that will be drown
+        :param orientation: bool - orientation of a ship that will be drown, True if Horizontal else False
+        :return:
+        """
+        frame = Frame(root,
+                      pady=25)
+
+        for i in range(tp):
+            bt = Button(frame,
+                        width=1,
+                        height=1,
+                        bg=Color.SHIP_COLOR,
+                        state=DISABLED)
+            if orientation:
+                bt.grid(row=0, column=i)
+            else:
+                bt.grid(row=i, column=0)
+
+        return frame
+
+    def __create_choose_frame(self, root):
+        """
+        Creates Ships choosing frame
+        :param root: tkinter master - container that the frame must be in
+        :return: tkinter Frame - created Frame
+        """
+        root.config(padx=10,
+                    pady=10)
+
+        # Choose frame
+        Label(root,
+              pady=3,
+              padx=15,
+              text=String.StatusFrame.MSG_CHOSE,
+              font="time 14 bold").pack(anchor=W)
+
+        for value, ship in String.StatusFrame.SHIPS:
+            Radiobutton(root,
+                        text=ship,
+                        padx=10,
+                        pady=4,
+                        width=16,
+                        anchor=W,
+                        indicatoron=0,
+                        variable=self.__chosen_ship,
+                        value=value,
+                        command=self.__on_ship_chosen).pack(anchor=W)
+
+    def __create_status_frame(self, root):
+        """
+        Creates Ship status frame
+        :param root: tkinter master - container that the frame must be in
+        :return: tkinter Frame - created Frame
+        """
+        root.config(padx=11,
+                    pady=10)
+
+        # Title
+        Label(root,
+              pady=3,
+              padx=15,
+              text=String.StatusFrame.MSG_CHOSEN,
+              font="time 14 bold").pack(anchor="w")
+
+        # Type variables
+        print("StatusFrame: __label_type created")
+        self.__label_type = Label(root,
+                                  text="Type: BATTLESHIP",
+                                  padx=10,
+                                  pady=3)
+        self.__label_type.pack(anchor=W)
+
+        # Amount variable
+        self.__label_amount = Label(root,
+                                    text="Amount: 1",
+                                    padx=10,
+                                    pady=2)
+        self.__label_amount.pack(anchor=W)
+
+        Label(root,
+              text=String.StatusFrame.HEADER_ORIENTATION,
+              padx=10,
+              pady=2).pack(anchor=W)
+
+        # Change orientation button
+        # Button(root,
+        #       text=String.StatusFrame.BUTTON_CHANGE,
+        #       width=15,
+        #       command=self.__on_change_button_pressed).pack(anchor=W)
+
+
+    def __create_map_frame(self, root):
+        """
+        Creates Ships choosing frame
+        :return: tkinter Frame - created Frame
+        """
+        self.__map = MapBuilder(self, root, 2)
+
+        # Map
+        self.__map.get_frame().pack()
