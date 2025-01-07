@@ -31,7 +31,7 @@ class Main(object):
 
         # Setting HelpFrame
         # todo
-        # self.__help_frame = game_env_interface.HelpFrame(self)
+        self.__help_frame = game_env_interface.HelpFrame(self)
 
     def start(self):
         """
