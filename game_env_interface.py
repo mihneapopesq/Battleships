@@ -899,3 +899,92 @@ class ArrangeFrame(object):
         :return: tkinter master
         """
         return self.__frame_map
+
+class GameFrame(object):
+    time = 0
+
+    def __init__(self, context, player: utils.Player, enemy: utils.Player):
+        self.__context = context
+        self.__last_hit_field = "", ""
+
+        # Creating players
+        self.__player = player
+        self.__enemy = enemy
+
+        # Player map frame
+        self.__frame_player = Frame(self.__context.get_root())
+        self.__map_player = None
+        self.__create_player_frame(self.__frame_player)
+        self.__map_player.set_player(self.__player)  # Sets the player to the created map
+        self.__map_player.connect_maps()  # Shoes the ships of the player on the map
+
+        # Enemy map frame
+        self.__frame_enemy = Frame(self.__context.get_root())
+        self.__map_enemy = None
+        self.__create_enemy_frame(self.__frame_enemy)
+        self.__map_enemy.set_player(self.__enemy)  # Sets the enemy to the created map
+
+        # Player status frame
+        self.__frame_status_player = Frame(self.__context.get_root())
+        self.__status_player = None
+        self.__create_status_player_frame(self.__frame_status_player)
+
+        # Enemy status frame
+        self.__frame_status_enemy = Frame(self.__context.get_root())
+        self.__status_enemy = None
+        self.__create_status_enemy_frame(self.__frame_status_enemy)
+
+        # Bar frame
+        self.__frame_bar = Frame(self.__context.get_root())
+        self.__label_turn = None
+        self.__label_warning = None
+        self.__create_bar_frame(self.__frame_bar)
+
+        # Turn value
+        self.__is_turn_of_player = True  # True if player's turn else False
+        self.__set_turn(self.__is_turn_of_player)  # Setting turns label
+
+    def on_point_clicked(self, x, y):
+        """
+        Map click listener
+        :param x: int - X coordinate of the clicked grid
+        :param y: int - Y coordinate of the clicked grid
+        :return: None
+        """
+        if self.__is_turn_of_player:
+            self.time += 1
+            print("Player shoot #%d" % self.time, (x, y))
+            self.__last_hit_field = x, y
+            self.__hit_point(x, y, self.__enemy, self.__map_enemy)
+        else:
+            self.__set_warning(String.GameFrame.WARNING_TURN_OF_ENEMY, "red")
+
+    def __on_back_menu_button_clicked(self):
+        """
+        Calls when back menu button is clicked
+        :return: None
+        """
+        is_player_agree = msg.askyesno(String.APP_NAME, String.StatusFrame.DIALOG_BACK_MENU)
+        if is_player_agree:
+            self.__context.on_game_back_button_pressed()
+
+    def __get_shoot_from_enemy(self, sms: str):
+        """
+        Calls when enemy shoots
+        :param sms: str - the message that have to be sent to enemy
+        :return: None
+        """
+        coord: tuple = self.__context.get_shoot(sms)
+        '''
+        if len(coord) != 2 or type(coord[0]) is not int or type(coord[1]) is not int \
+                or self.__map_player.get_button(coord[0], coord[1]).cget("state") == DISABLED \
+                or coord[0] not in range(1, 11) or coord[1] not in range(1, 11) or coord is None:
+            self.__context.get_shoot(String.GameFrame.BOT_ERROR)
+            raise ShipException("Bot shot incorrectly! Unexpected bot!", "")
+        '''
+
+        if not self.__is_turn_of_player:
+            self.__last_hit_field = coord
+            self.__hit_point(coord[0], coord[1], self.__player, self.__map_player)
+        else:
+            print("GameFrame: enemy tries to shoot while it is player's turn")
