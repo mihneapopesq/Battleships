@@ -29,7 +29,7 @@ class Main(object):
         self.play_background_music(constants.Strings.APP_MUSIC)
 
         # Load background image
-        self.background_image = PhotoImage(file='battleships.png')
+        self.background_image = PhotoImage(file='resources/battleships.png')
         self.background_label = Label(self.__root, image=self.background_image)
         self.background_label.place(relwidth=1, relheight=1)  # Make the image fill the entire window
 

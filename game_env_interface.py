@@ -604,10 +604,10 @@ class GameFrame(object):
         self.__is_turn_of_player = True
         self.__set_turn(self.__is_turn_of_player)
 
-        self.hit_sound = pygame.mixer.Sound('explosion.wav')
-        self.victory_sound = pygame.mixer.Sound('headshot.wav')
-        self.defeat_sound = pygame.mixer.Sound('womp.wav')
-        self.miss_sound = pygame.mixer.Sound('water.wav')
+        self.hit_sound = pygame.mixer.Sound('resources/explosion.wav')
+        self.victory_sound = pygame.mixer.Sound('resources/headshot.wav')
+        self.defeat_sound = pygame.mixer.Sound('resources/womp.wav')
+        self.miss_sound = pygame.mixer.Sound('resources/water.wav')
 
     def on_point_clicked(self, x, y):
         if self.__is_turn_of_player:
