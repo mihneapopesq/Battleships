@@ -315,8 +315,8 @@ class ArrangeFrame(object):
                 )
             else:
                 # Automatically switch to the next type if you've finished placing the current one
-                if self.__chosen_ship.get() > 1 and \
-                   self.__player.get_non_placed_amount(self.__chosen_ship.get()) == 0:
+                if self.__chosen_ship.get() > 2 and \
+                        self.__player.get_non_placed_amount(self.__chosen_ship.get()) == 0:
                     self.__chosen_ship.set(self.__chosen_ship.get() - 1)
 
             self.__on_ship_chosen()
