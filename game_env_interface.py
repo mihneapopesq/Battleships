@@ -5,6 +5,7 @@ from constants import Colors as Color
 from constants import BOT_SHOOT_TIME
 import utils
 import board
+import pygame
 
 
 class MapBuilder(object):
@@ -189,7 +190,7 @@ class MenuFrame(object):
 
     def __create_frame(self, root):
         frame = Frame(root, padx=10, pady=10, highlightthickness=1,
-                      highlightbackgroun=Color.MenuFrame.BACKGROUND_BUTTONS)
+                      highlightbackground=Color.MenuFrame.BACKGROUND_BUTTONS)
 
         Label(frame,
               text=String.MenuFrame.TITLE,
@@ -220,7 +221,8 @@ class MenuFrame(object):
         return frame
 
     def place_frame(self):
-        self.__frame.place(relx=0.17, rely=0.3, anchor=CENTER)
+        # Place the frame at the center of the parent window
+        self.__frame.place(relx=0.5, rely=0.5, anchor=CENTER)
 
     def displace_frame(self):
         self.__frame.place_forget()
@@ -602,6 +604,11 @@ class GameFrame(object):
         self.__is_turn_of_player = True
         self.__set_turn(self.__is_turn_of_player)
 
+        self.hit_sound = pygame.mixer.Sound('explosion.wav')
+        self.victory_sound = pygame.mixer.Sound('headshot.wav')
+        self.defeat_sound = pygame.mixer.Sound('womp.wav')
+        self.miss_sound = pygame.mixer.Sound('water.wav')
+
     def on_point_clicked(self, x, y):
         if self.__is_turn_of_player:
             self.time += 1
@@ -665,8 +672,10 @@ class GameFrame(object):
 
     def __show_result_of_battle(self, loser: utils.Player):
         if loser is not self.__player:
+            pygame.mixer.Sound.play(self.victory_sound)  # Play victory sound when you win
             msg.showinfo(String.GameFrame.TITLE_VICTORY, String.GameFrame.MSG_VICTORY)
         else:
+            pygame.mixer.Sound.play(self.defeat_sound)  # Play defeat sound when you lose
             msg.showinfo(String.GameFrame.TITLE_DEFEAT, String.GameFrame.MSG_DEFEAT)
         self.__context.on_game_back_button_pressed()
 
@@ -679,6 +688,7 @@ class GameFrame(object):
                 if ship.get_status():
                     mp.get_button(x, y).config(bg=Color.DESTROYED_PART, state=DISABLED)
                     self.__set_warning(String.GameFrame.WARNING_HIT, "blue")
+                    self.hit_sound.play()
                     if defence is self.__player:
                         mp.get_button(1, 1).after(
                             BOT_SHOOT_TIME["hit"],
@@ -686,6 +696,7 @@ class GameFrame(object):
                         )
                 else:
                     mp.get_button(x, y).config(state=DISABLED)
+                    self.hit_sound.play()
                     self.__ship_destroyed(ship, mp)
                     self.__set_warning(String.GameFrame.WARNING_SHIP_DESTROYED, "green")
                     defence.remove_ship(point)
@@ -705,7 +716,7 @@ class GameFrame(object):
             self.__set_turn(self.__is_turn_of_player)
             self.__set_warning(String.GameFrame.WARNING_MISS, "red")
             mp.get_button(x, y).config(text="*", bg=Color.BROKEN_POINT, state=DISABLED)
-
+            self.miss_sound.play()
             if defence is self.__enemy:
                 mp.get_button(1, 1).after(
                     BOT_SHOOT_TIME["shoot"],
@@ -714,6 +725,7 @@ class GameFrame(object):
 
     @staticmethod
     def __ship_destroyed(ship: utils.Ship, mp: MapBuilder):
+
         for i in range(ship.get_type()):
             xx = ship.get_x_at(i)
             yy = ship.get_y_at(i)
@@ -736,6 +748,7 @@ class GameFrame(object):
                 mp.get_button(xx-1, yy+1).config(bg=Color.BROKEN_POINT, text="*", state=DISABLED)
             if xx < 10 and yy > 1 and mp.get_button(xx+1, yy-1).cget("bg") == Color.MAP_COLOR:
                 mp.get_button(xx+1, yy-1).config(bg=Color.BROKEN_POINT, text="*", state=DISABLED)
+
 
     def place_frame(self):
         self.__frame_player.place(relx=0.05, rely=0.95, anchor=SW)
@@ -780,7 +793,7 @@ class HelpFrame(object):
                 text=String.HelpFrame.MSG_HELP,
                 justify=LEFT,
                 fg=Color.HELP_MSG,
-                font="Verdana 20 bold").pack()
+                font="Verdana 14 bold").pack()
 
     def place_frame(self):
         self.__button_back.place(relx=0.01, rely=0.05, anchor=NW)

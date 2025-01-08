@@ -6,7 +6,7 @@ BOT_SHOOT_TIME = {"shoot": 1000, "hit": 1500, "destroyed": 1500}
 class Strings:
     APP_NAME = "BattleShip"
     APP_BACKGROUND = "drawable/battleship2.jpg"
-    APP_MUSIC = "sound/jook.wave"
+    APP_MUSIC = "sound.wav"
 
     class MenuFrame:
         TITLE = "Menu:"
@@ -66,18 +66,26 @@ class Strings:
 
     class HelpFrame:
         MSG_HELP = """
-        Players:
+Players:
 •   2
 
-        Goal:
-•   Sink all of your opponent’s ships
+Objective:
+•   Sink all the opponent's ships.
 
-        Setup:
-•   Each player places ships on the bottom grid
+Setup:
+•   Each player arranges their ships on a hidden grid.
 
-        Rules:
-•   Take turns firing shots by calling out grid coordinates
-•   Mark shots you fire on the vertical target grid
+Gameplay:
+•   Players take turns guessing grid coordinates to locate and hit the opponent's ships.
+•   A ship is sunk when all its sections have been hit.
+•   The first player to sink all enemy ships wins.
+
+Tips:
+•   Plan strategically based on your hits and misses.
+•   Keep track of your attempts to increase hit accuracy.
+
+Enjoy the game!
+
         """
 
 
@@ -102,7 +110,7 @@ class Colors:
     DESTROYED_SHIP = "#7c0d0f"
     DESTROYED_PART = "red"
     BROKEN_POINT = "yellow"
-    HELP_MSG = "#079b5b"
+    HELP_MSG = "#000080"
 
     class MenuFrame:
         BACKGROUND_BUTTONS = "#000"

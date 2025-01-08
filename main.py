@@ -6,13 +6,13 @@ import constants
 import utils
 import board
 import ai
+import pygame
 
 
 class Main(object):
     time = 0
 
     def __init__(self):
-
         self.__root = Tk()
         self.__root.title(constants.Strings.APP_NAME)
         self.__root.minsize(constants.Dimensions.APP_MIN_WIDTH,
@@ -20,6 +20,18 @@ class Main(object):
         self.__root.maxsize(constants.Dimensions.APP_MAX_WIDTH,
                             constants.Dimensions.APP_MAX_HEIGHT)
         self.__root.protocol("WM_DELETE_WINDOW", self.on_exit_button_pressed)
+
+        # Initialize pygame mixer
+        pygame.init()
+        pygame.mixer.init()
+
+        # Load and play background music
+        self.play_background_music(constants.Strings.APP_MUSIC)
+
+        # Load background image
+        self.background_image = PhotoImage(file='battleships.png')
+        self.background_label = Label(self.__root, image=self.background_image)
+        self.background_label.place(relwidth=1, relheight=1)  # Make the image fill the entire window
 
         # Setting MainFrame
         self.__menu_frame = game_env_interface.MenuFrame(self)
@@ -30,6 +42,22 @@ class Main(object):
 
         # Setting HelpFrame
         self.__help_frame = game_env_interface.HelpFrame(self)
+
+        # Center the window on the screen
+        self.center_window()
+
+    def play_background_music(self, filename):
+        pygame.mixer.music.load(filename)
+        pygame.mixer.music.play(-1)  # Play the music indefinitely
+
+
+    def center_window(self):
+        self.__root.update_idletasks()  # Update "requested size" from geometry manager
+        width = self.__root.winfo_width()
+        height = self.__root.winfo_height()
+        x = (self.__root.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.__root.winfo_screenheight() // 2) - (height // 2)
+        self.__root.geometry('+{}+{}'.format(x, y))
 
     def start(self):
         """
@@ -43,6 +71,8 @@ class Main(object):
         :return: BaseWidget tkinter root (master)
         """
         return self.__root
+    # Other methods remain unchanged
+
 
     # Menu frame
     def on_start_arrange_button_pressed(self):
